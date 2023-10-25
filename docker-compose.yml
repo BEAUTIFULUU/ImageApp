@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8080
+    volumes:
+      - .:/app
+    ports:
+      - 8081:8080
+    env_file:
+      - dev.env
+    depends_on:
+      - db
+    environment:
+      - DJANGO_SETTINGS_MODULE=ImageApp.settings
+    networks:
+      - imageapp_default
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - dev.env
+    networks:
+      - imageapp_default
+
+  cleanup_images:
+    build: .
+    command: python manage.py cleanup_images
+    volumes:
+      - .:/app
+    env_file:
+      - dev.env
+    depends_on:
+      - db
+    networks:
+      - imageapp_default
+
+  pytest:
+    build: .
+    command: pytest
+    volumes:
+      - .:/app
+    env_file:
+      - dev.env
+    depends_on:
+      - db
+    networks:
+      - imageapp_default
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - imageapp_default
+
+  celery:
+    build: .
+    command: celery -A ImageApp worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - dev.env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - imageapp_default
+
+  flower:
+    image: mher/flower:0.9.7
+    command: [ 'flower', '--broker=redis://redis:6379', '--port=5555' ]
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+    networks:
+      - imageapp_default
+
+
+volumes:
+  postgres_data:
+
+networks:
+  imageapp_default:
+    driver: bridge
+
