@@ -4,8 +4,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.request import Request
 from rest_framework.serializers import Serializer
+from images.services.validation_services import validate_image_format
 from images.models import UserImage
-from images.serializers import BasicImageOutputSerializer, PremiumImageOutputSerializer, EnterpriseImageOutputSerializer
+from images.tasks import resize_image
 
 
 def get_image_details(image_id: int, user: User) -> UserImage:
@@ -22,50 +23,13 @@ def get_user_images(user: User) -> QuerySet:
     return UserImage.objects.filter(user=user)
 
 
-def create_image_obj(request: Request, serializer: Serializer) -> UserImage:
-    user = request.user.userprofile
-    image_obj = UserImage(user=user, image=serializer.validated_data['image'])
-    image_obj.save()
+def create_image_obj(user, image):
+    validate_image_format(image)
+    image_obj = UserImage(user=user, image=image)
+    if user.userprofile.account_tier == 'basic':
+        resize_image.apply_async(args=(user, image_obj.image, 200))
+    if user.userprofile.account_tier in ['premium', 'enterprise']:
+        resize_image.apply_async(args=(user, image_obj.image, 200))
+        resize_image.apply_async(args=(user, image_obj.image, 400))
     return image_obj
-
-
-def get_user_images_based_on_account_level(
-        user: User, images: QuerySet[UserImage], request: Request) -> list[UserImage] | None:
-    error_message = 'Error while displaying images.'
-    account_tier = user.userprofile.account_tier
-
-    if account_tier == 'basic':
-        serializer = BasicImageOutputSerializer(images, many=True, context={'request': request})
-        return serializer.data
-    elif account_tier == 'premium':
-        serializer = PremiumImageOutputSerializer(images, many=True, context={'request': request})
-        return serializer.data
-    elif account_tier == 'enterprise':
-        serializer = EnterpriseImageOutputSerializer(images, many=True, context={'request': request})
-        return serializer.data
-
-    else:
-        raise serializers.ValidationError(error_message)
-
-
-def create_user_images_based_on_account_level(user: User, image_obj: UserImage, request: Request):
-    error_message = 'Error while displaying images.'
-    account_tier = user.userprofile.account_tier
-
-    if account_tier == 'basic':
-        serializer = BasicImageOutputSerializer(image_obj, context={'request': request})
-        return serializer.data
-    elif account_tier == 'premium':
-        serializer = PremiumImageOutputSerializer(image_obj, context={'request': request})
-        return serializer.data
-    elif account_tier == 'enterprise':
-        serializer = EnterpriseImageOutputSerializer(image_obj, context={'request': request})
-        return serializer.data
-    else:
-        raise serializers.ValidationError(error_message)
-
-
-
-
-
 

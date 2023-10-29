@@ -35,6 +35,12 @@ class UserImage(models.Model):
     upload_date = models.DateTimeField(auto_now_add=True)
 
 
+class ImageThumbnail(models.Model):
+    user_image = models.ForeignKey(UserImage, on_delete=models.CASCADE, related_name='thumbnails')
+    image_thumb = models.ImageField(
+        upload_to='images/', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
+
+
 class Tier(models.Model):
     name = models.CharField(max_length=100)
     thumbnail_sizes = models.JSONField()
