@@ -11,7 +11,7 @@ class ThumbnailOutputSerializer(serializers.ModelSerializer):
 
 
 class ImageOutputSerializer(serializers.ModelSerializer):
-    image_thumb = ThumbnailOutputSerializer(many=True, read_only=True)
+    image_thumb = ThumbnailOutputSerializer(many=True, read_only=True, source='thumbnails')
 
     class Meta:
         model = UserImage

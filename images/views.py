@@ -1,12 +1,14 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status, permissions, views
+from rest_framework.parsers import MultiPartParser
 from .serializers import ImageDetailOutputSerializer, ImageDetailInputSerializer, ImageOutputSerializer
 from .services.basic_services import get_user_images, get_image_details, delete_image, create_image_obj
 from .services.expiring_link_services import generate_image_temporary_link
 
 
 class ImagesView(views.APIView):
+    parser_classes = [MultiPartParser]
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request: Request) -> Response:
@@ -15,7 +17,8 @@ class ImagesView(views.APIView):
         return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
-        create_image_obj(user=request.user.id, image=request.data['image'])
+        image = request.FILES.get('image')
+        create_image_obj(user=request.user, image=image)
         return Response(status=status.HTTP_201_CREATED)
 
 

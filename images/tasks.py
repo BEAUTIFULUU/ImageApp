@@ -1,31 +1,27 @@
+import uuid
 from io import BytesIO
 from PIL import Image
 from celery import shared_task
-from images.models import ImageThumbnail
+from django.core.files.base import ContentFile
+from images.models import ImageThumbnail, UserImage
 
 
 @shared_task
-def resize_image(user, uploaded_image, height):
-
-    image = Image.open(uploaded_image)
+def resize_image(height: int, image_id: int) -> None:
+    user_image = UserImage.objects.get(pk=image_id)
+    img = Image.open(user_image.image)
+    img.convert('RGB')
 
     new_height = height
-    new_width = int((float(image.width) / image.height) * new_height)
-    image.thumbnail((new_width, new_height))
-    resized_image_200 = BytesIO()
+    new_width = int((float(img.width) / img.height) * new_height)
+    img.thumbnail((new_width, new_height))
 
-    thumbnail_200_px = ImageThumbnail(user_image=uploaded_image, image=resized_image_200)
-    thumbnail_200_px.save()
+    output = BytesIO()
+    img.save(output, format='JPEG')
+    output.seek(0)
 
-    if user.userprofile.account_tier in ['premium', 'enterprise']:
-        image = Image.open(uploaded_image)
+    thumbnail = ImageThumbnail(user_image=user_image)
+    thumbnail.image_thumb.save(f'thumbnail_{uuid.uuid4()}.jpeg', ContentFile(output.getvalue()), save=True)
 
-        new_height = height
-        new_width = int((float(image.width) / image.height) * new_height)
-        image.thumbnail((new_width, new_height))
-        resized_image_400 = BytesIO()
-
-        thumbnail_400_px = ImageThumbnail(user_image=uploaded_image, image=resized_image_400)
-        thumbnail_400_px.save()
-
-    image.close()
+    thumbnail.save()
+    output.close()
