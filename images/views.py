@@ -18,6 +18,7 @@ class ImagesView(views.APIView):
 
     def post(self, request: Request) -> Response:
         image = request.FILES.get('image')
+
         create_image_obj(user=request.user, image=image)
         return Response(status=status.HTTP_201_CREATED)
 
