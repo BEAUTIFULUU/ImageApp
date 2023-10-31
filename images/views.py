@@ -2,7 +2,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status, permissions, views
 from rest_framework.parsers import MultiPartParser
-from .serializers import ImageDetailOutputSerializer, ImageDetailInputSerializer, ImageOutputSerializer
+from .serializers import ImageDetailOutputSerializer, ImageDetailInputSerializer, ImageOutputSerializer, \
+    BasicImageOutputSerializer
 from .services.basic_services import get_user_images, get_image_details, delete_image, create_image_obj
 from .services.expiring_link_services import generate_image_temporary_link
 
@@ -13,12 +14,15 @@ class ImagesView(views.APIView):
 
     def get(self, request: Request) -> Response:
         images = get_user_images(user=request.user.id)
-        serializer = ImageOutputSerializer(images, many=True)
-        return Response(serializer.data)
+        if request.user.userprofile.account_tier in ['premium', 'enterprise']:
+            serializer = ImageOutputSerializer(images, many=True)
+            return Response(serializer.data)
+        else:
+            serializer = BasicImageOutputSerializer(images, many=True)
+            return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
         image = request.FILES.get('image')
-
         create_image_obj(user=request.user, image=image)
         return Response(status=status.HTTP_201_CREATED)
 
@@ -31,12 +35,12 @@ class ImageDetailView(views.APIView):
         serializer = ImageDetailOutputSerializer(image_obj)
         return Response(serializer.data)
 
-    def post(self, request, image_id):
+    def post(self, request: Request, image_id: int) -> Response:
         if request.user.userprofile.account_tier == 'enterprise':
             serializer = ImageDetailInputSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             time = serializer.validated_data['image_link_time']
-            temporary_link = generate_image_temporary_link(image_id=image_id, time=time, request=request)
+            temporary_link = generate_image_temporary_link(image_id=image_id, time=time)
             return Response({'temporary_link': temporary_link}, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_403_FORBIDDEN)
 

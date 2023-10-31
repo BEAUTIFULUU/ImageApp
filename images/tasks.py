@@ -21,7 +21,7 @@ def resize_image(height: int, image_id: int) -> None:
     output.seek(0)
 
     thumbnail = ImageThumbnail(user_image=user_image)
-    thumbnail.image_thumb.save(f'thumbnail_{uuid.uuid4()}.jpeg', ContentFile(output.getvalue()), save=True)
+    thumbnail.image_thumb.save(f'thumbnail_{height}_{uuid.uuid4()}.jpg', ContentFile(output.getvalue()), save=True)
 
     thumbnail.save()
     output.close()

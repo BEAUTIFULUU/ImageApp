@@ -1,14 +1,8 @@
 import os
 import uuid
-
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers
-from rest_framework.request import Request
-from rest_framework.serializers import Serializer
-
-from ImageApp import settings
 from images.services.validation_services import validate_image_format
 from images.models import UserImage
 from images.tasks import resize_image
@@ -31,15 +25,16 @@ def get_user_images(user: User) -> QuerySet:
 def create_image_obj(user, image: UserImage):
     user_profile = user.userprofile
     validate_image_format(image)
-    new_image_name = f"{uuid.uuid4()}{os.path.splitext(image.name)[-1]}"
+    new_image_name = f'{uuid.uuid4()}{os.path.splitext(image.name)[-1]}'
     image_obj = UserImage(user=user_profile, image=image)
     image_obj.image.name = new_image_name
     image_obj.save()
 
-    resize_image.apply_async(args=(200, image_obj.pk))
-
     if user_profile.account_tier in ['premium', 'enterprise']:
+        resize_image.apply_async(args=(200, image_obj.pk))
         resize_image.apply_async(args=(400, image_obj.pk))
+    if user_profile.account_tier == 'basic':
+        resize_image.apply_async(args=(200, image_obj.pk))
 
     return image_obj
 
