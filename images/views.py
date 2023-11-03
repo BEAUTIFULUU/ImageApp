@@ -14,12 +14,17 @@ class ImagesView(views.APIView):
 
     def get(self, request: Request) -> Response:
         images = get_user_images(user=request.user.id)
-        if request.user.userprofile.account_tier in ['premium', 'enterprise']:
-            serializer = ImageOutputSerializer(images, many=True)
-            return Response(serializer.data)
+        user_profile = request.user.userprofile
+
+        if user_profile.account_tier in ['premium', 'enterprise']:
+            serializer_class = ImageOutputSerializer
+        elif user_profile.custom_tier.original_image_link:
+            serializer_class = ImageOutputSerializer
         else:
-            serializer = BasicImageOutputSerializer(images, many=True)
-            return Response(serializer.data)
+            serializer_class = BasicImageOutputSerializer
+
+        serializer = serializer_class(images, many=True)
+        return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
         image = request.FILES.get('image')
@@ -36,7 +41,7 @@ class ImageDetailView(views.APIView):
         return Response(serializer.data)
 
     def post(self, request: Request, image_id: int) -> Response:
-        if request.user.userprofile.account_tier == 'enterprise':
+        if request.user.userprofile.account_tier == 'enterprise' or request.user.userprofile.custom_tier.expiring_link:
             serializer = ImageDetailInputSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             time = serializer.validated_data['image_link_time']

@@ -1,9 +1,6 @@
 import os
 from datetime import datetime, timedelta
 import uuid
-
-from rest_framework.request import Request
-
 from images.models import UserImage
 from images.services.cache_services import store_temporary_link_in_cache, get_temporary_link_from_cache
 

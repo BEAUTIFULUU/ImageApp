@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .forms import UserProfileAdminForm, TierAdminForm
-from .models import UserProfile, Tier
+from .forms import UserProfileAdminForm
+from .models import UserProfile, CustomTier
 
 
 class UserProfileAdmin(admin.ModelAdmin):
@@ -8,5 +8,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     form = UserProfileAdminForm
 
 
-admin.site.register(UserProfile, UserProfileAdmin)
-admin.site.register(Tier)
+class TierAdmin(admin.ModelAdmin):
+
+    admin.site.register(UserProfile, UserProfileAdmin)
+    admin.site.register(CustomTier)

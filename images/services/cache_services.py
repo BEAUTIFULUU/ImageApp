@@ -1,4 +1,8 @@
 from django.core.cache import cache
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+
+from images.models import UserImage
 
 
 def store_temporary_link_in_cache(image_id: int, temporary_link, expiration_time):
@@ -8,5 +12,12 @@ def store_temporary_link_in_cache(image_id: int, temporary_link, expiration_time
 
 
 def get_temporary_link_from_cache(image_id: int):
+    try:
+        get_object_or_404(UserImage, pk=image_id)
+    except Http404:
+        cache_key = f'temporary_link_{image_id}'
+        cache.delete(cache_key)
+        return "Image not found."
+
     cache_key = f'temporary_link_{image_id}'
     return cache.get(cache_key)

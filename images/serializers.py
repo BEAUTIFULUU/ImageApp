@@ -15,7 +15,8 @@ class ThumbnailOutputSerializer(serializers.ModelSerializer):
         if image_thumb:
             base_url = os.environ.get('BASE_URL', '')
             image_thumb_url = f'{base_url}{image_thumb}'
-            return {image_thumb_url}
+            return image_thumb_url
+
         return super().to_representation(instance)
 
 
@@ -33,6 +34,7 @@ class ImageOutputSerializer(serializers.ModelSerializer):
             base_url = os.environ.get('BASE_URL', '')
             image_url = f'{base_url}{image}'
             representation['image'] = image_url
+
         return representation
 
 

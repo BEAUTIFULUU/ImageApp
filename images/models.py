@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 
 
 class UserProfile(models.Model):
@@ -15,8 +15,9 @@ class UserProfile(models.Model):
     DEFAULT_ACCOUNT_TIER_LEVEL = 'basic'
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    custom_tier = models.ForeignKey('CustomTier', null=True, blank=True, on_delete=models.SET_NULL)
     account_tier = models.CharField(
-        max_length=10, choices=ACCOUNT_TIER_LEVEL_CHOICES, default=DEFAULT_ACCOUNT_TIER_LEVEL)
+        max_length=10, choices=ACCOUNT_TIER_LEVEL_CHOICES, null=True, blank=True)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
@@ -41,8 +42,13 @@ class ImageThumbnail(models.Model):
         upload_to='images/', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
 
 
-class Tier(models.Model):
+class CustomTier(models.Model):
     name = models.CharField(max_length=100)
-    thumbnail_sizes = models.JSONField()
     original_image_link = models.BooleanField(default=True)
-    expiring_links = models.BooleanField(default=False)
+    expiring_link = models.BooleanField(default=False)
+    thumbnail_height = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5000)])
+    thumbnail_width = models.IntegerField()
+
+
+
+
