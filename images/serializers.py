@@ -28,14 +28,16 @@ class ImageOutputSerializer(serializers.ModelSerializer):
         fields = ['id', 'upload_date', 'image', 'image_thumb']
 
     def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        image = instance.image.url
-        if image:
-            base_url = os.environ.get('BASE_URL', '')
-            image_url = f'{base_url}{image}'
-            representation['image'] = image_url
+        if isinstance(instance, UserImage):
+            representation = super().to_representation(instance)
+            image = instance.image.url
+            if image:
+                base_url = os.environ.get('BASE_URL', '')
+                image_url = f'{base_url}{image}'
+                representation['image'] = image_url
 
-        return representation
+            return representation
+        return super().to_representation(instance)
 
 
 class BasicImageOutputSerializer(serializers.ModelSerializer):

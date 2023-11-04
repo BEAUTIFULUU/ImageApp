@@ -17,7 +17,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     custom_tier = models.ForeignKey('CustomTier', null=True, blank=True, on_delete=models.SET_NULL)
     account_tier = models.CharField(
-        max_length=10, choices=ACCOUNT_TIER_LEVEL_CHOICES, null=True, blank=True)
+        max_length=10, choices=ACCOUNT_TIER_LEVEL_CHOICES, null=True, blank=True, default=DEFAULT_ACCOUNT_TIER_LEVEL)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
@@ -47,7 +47,11 @@ class CustomTier(models.Model):
     original_image_link = models.BooleanField(default=True)
     expiring_link = models.BooleanField(default=False)
     thumbnail_height = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5000)])
-    thumbnail_width = models.IntegerField()
+    thumbnail_width = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5000)])
+
+    def __str__(self):
+        return self.name
+
 
 
 
