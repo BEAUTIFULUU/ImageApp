@@ -29,14 +29,17 @@ def create_image_obj(user, image: UserImage):
     image_obj = UserImage(user=user_profile, image=image)
     image_obj.image.name = new_image_name
     image_obj.save()
-    if user_profile.account_tier in ['premium', 'enterprise']:
-        resize_image.apply_async(args=(200, None, image_obj.pk))
+
+    account_tier = user_profile.account_tier
+
+    if account_tier.name in ['Premium', 'Enterprise']:
+        resize_image.apply_async(args=(account_tier.thumbnail_height, None, image_obj.pk))
         resize_image.apply_async(args=(400, None, image_obj.pk))
-    elif user_profile.account_tier == 'basic':
-        resize_image.apply_async(args=(200, None, image_obj.pk))
+    elif account_tier.name == 'Basic':
+        resize_image.apply_async(args=(account_tier.thumbnail_height, None, image_obj.pk))
     else:
-        custom_thumbnail_height = user_profile.custom_tier.thumbnail_height
-        custom_thumbnail_width = user_profile.custom_tier.thumbnail_width
+        custom_thumbnail_height = account_tier.thumbnail_height
+        custom_thumbnail_width = account_tier.thumbnail_width
         resize_image.apply_async(args=(custom_thumbnail_height, custom_thumbnail_width, image_obj.pk))
 
     return image_obj

@@ -1,11 +1,9 @@
 from typing import Type
-
 from django.db.models import QuerySet
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status, permissions, views, generics
 from rest_framework.parsers import MultiPartParser
-
 from .models import UserImage
 from .serializers import ImageDetailOutputSerializer, ImageDetailInputSerializer, ImageOutputSerializer, \
     BasicImageOutputSerializer
@@ -20,10 +18,9 @@ class ImagesView(generics.ListCreateAPIView):
 
     def get_serializer_class(self) -> Type[ImageOutputSerializer] | Type[BasicImageOutputSerializer]:
         user_profile = self.request.user.userprofile
+        account_tier = user_profile.account_tier
 
-        if user_profile.account_tier in ['premium', 'enterprise']:
-            return ImageOutputSerializer
-        elif user_profile.custom_tier and user_profile.custom_tier.original_image_link:
+        if account_tier and (account_tier.name in ['Premium', 'Enterprise'] or account_tier.original_image_link):
             return ImageOutputSerializer
         else:
             return BasicImageOutputSerializer
@@ -48,7 +45,7 @@ class ImageDetailView(views.APIView):
     def post(self, request: Request, image_id: int) -> Response:
         user_profile = request.user.userprofile
         is_enterprise = user_profile.account_tier == 'enterprise'
-        has_expiring_link = user_profile.custom_tier and user_profile.custom_tier.expiring_link
+        has_expiring_link = user_profile.account_tier.original_image_link
 
         if is_enterprise or has_expiring_link:
             serializer = ImageDetailInputSerializer(data=request.data)

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .forms import UserProfileAdminForm
-from .models import UserProfile, CustomTier
+from .models import UserProfile, AccountTier
 
 
 class UserProfileAdmin(admin.ModelAdmin):
@@ -11,4 +11,4 @@ class UserProfileAdmin(admin.ModelAdmin):
 class TierAdmin(admin.ModelAdmin):
 
     admin.site.register(UserProfile, UserProfileAdmin)
-    admin.site.register(CustomTier)
+    admin.site.register(AccountTier)
