@@ -1,12 +1,13 @@
-import filetype
+import magic
 from rest_framework.exceptions import ValidationError
+from ImageApp import settings
+from images.models import UserImage
 
 
-def validate_image_format(uploaded_image):
-    kind = filetype.guess(uploaded_image.read())
+def validate_image_format(uploaded_image: UserImage):
+    image_bytes = uploaded_image.read()
+    mime_type = magic.Magic(mime=True)
+    content_type = mime_type.from_buffer(image_bytes[:2048])
 
-    if kind is None:
-        raise ValidationError('Invalid file format. Only JPEG and PNG images are allowed.')
-
-    elif kind.extension not in ['jpg', 'png']:
-        raise ValidationError('Invalid file format. Only JPEG and PNG images are allowed.')
+    if content_type not in settings.WHITELISTED_IMAGE_TYPES.values():
+        raise ValidationError('Invalid image content-type')
