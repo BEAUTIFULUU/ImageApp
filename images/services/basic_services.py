@@ -22,7 +22,7 @@ def get_user_images(user: User) -> QuerySet:
     return UserImage.objects.filter(user=user).prefetch_related('thumbnails')
 
 
-def create_image_obj(user, image: UserImage):
+def create_image_obj(user, image: UserImage) -> UserImage:
     user_profile = user.userprofile
     validate_image_format(image)
     new_image_name = f'{uuid.uuid4()}{os.path.splitext(image.name)[-1]}'

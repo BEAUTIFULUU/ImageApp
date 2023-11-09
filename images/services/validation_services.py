@@ -4,7 +4,7 @@ from django.conf import settings
 from images.models import UserImage
 
 
-def validate_image_format(uploaded_image: UserImage):
+def validate_image_format(uploaded_image: UserImage) -> None:
     image_bytes = uploaded_image.read()
     mime = magic.Magic(mime=True)
     mime_type = mime.from_buffer(image_bytes[:2048])
