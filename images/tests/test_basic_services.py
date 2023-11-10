@@ -62,7 +62,7 @@ def create_authenticated_user_with_user_profile_instance(create_basic_acc_tier):
 def create_user_image(create_authenticated_user_with_user_profile_instance):
     user, client = create_authenticated_user_with_user_profile_instance
 
-    image_path = 'images/tests1/test_images/test_img.jpg'
+    image_path = 'images/tests/test_images/test_img.jpg'
     image = Image.open(image_path)
 
     tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
