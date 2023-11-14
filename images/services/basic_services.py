@@ -38,8 +38,6 @@ def create_image_obj(user, image: UserImage) -> UserImage:
     elif account_tier.name == 'Basic':
         resize_image.apply_async(args=(account_tier.thumbnail_height, None, image_obj.pk))
     else:
-        custom_thumbnail_height = account_tier.thumbnail_height
-        custom_thumbnail_width = account_tier.thumbnail_width
-        resize_image.apply_async(args=(custom_thumbnail_height, custom_thumbnail_width, image_obj.pk))
+        resize_image.apply_async(args=(account_tier.thumbnail_height, account_tier.thumbnail_width, image_obj.pk))
 
     return image_obj

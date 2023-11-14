@@ -187,3 +187,5 @@ WHITELISTED_IMAGE_TYPES = {
     'jpg': 'image/jpeg',
     'png': 'image/png'
 }
+
+CELERY_TASK_ALWAYS_EAGER = True

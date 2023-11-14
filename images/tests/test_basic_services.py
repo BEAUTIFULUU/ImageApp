@@ -4,13 +4,19 @@ from PIL import Image
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import Http404
+from unittest.mock import patch
 from rest_framework.test import APIClient
 from ..services.basic_services import get_image_details, get_user_images, delete_image, create_image_obj
-from ..models import UserImage, UserProfile, AccountTier
-from images.services.validation_services import validate_image_format
-from images.tasks import resize_image
+from ..models import UserImage, UserProfile, AccountTier, ImageThumbnail
+
 
 User = get_user_model()
+
+
+@pytest.fixture
+def mock_apply_async():
+    with patch('images.services.basic_services.resize_image.apply_async') as mock:
+        yield mock
 
 
 @pytest.fixture
@@ -50,8 +56,20 @@ def create_enterprise_acc_tier():
 
 
 @pytest.fixture
-def create_authenticated_user_with_user_profile_instance(create_basic_acc_tier):
-    """"The built-in Django User model is automatically extended with a UserProfile through signals in models.py."""
+def create_custom_acc_tier():
+    basic_acc_tier = AccountTier.objects.create(
+        name='600x400',
+        original_image_link=True,
+        expiring_link=False,
+        thumbnail_height=600,
+        thumbnail_width=500
+    )
+    return basic_acc_tier
+
+
+@pytest.fixture
+def create_authenticated_user_with_basic_tier(create_basic_acc_tier):
+    """The built-in Django User model is automatically extended with a UserProfile through signals in models.py."""
     user = User.objects.create_user(username='123', password='123')
     client = APIClient()
     client.login(username='123', password='123')
@@ -59,8 +77,8 @@ def create_authenticated_user_with_user_profile_instance(create_basic_acc_tier):
 
 
 @pytest.fixture
-def create_user_image(create_authenticated_user_with_user_profile_instance):
-    user, client = create_authenticated_user_with_user_profile_instance
+def create_user_image(create_authenticated_user_with_basic_tier):
+    user, client = create_authenticated_user_with_basic_tier
 
     image_path = 'images/tests/test_images/test_img.jpg'
     image = Image.open(image_path)
@@ -101,5 +119,77 @@ class TestUserImageLogic:
 
         assert not UserImage.objects.filter(pk=user_image.pk).exists()
 
-    def test_create_image_object(self, mocker, create_user_image):
-        user_image = create_user_image
+    def test_create_image_obj_for_basic_tier_user(self, create_authenticated_user_with_basic_tier, mock_apply_async):
+        user, _ = create_authenticated_user_with_basic_tier
+
+        image_path = 'images/tests/test_images/test_img.jpg'
+        image = Image.open(image_path)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
+        image.save(tmp_file.name)
+        uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
+
+        image_obj = create_image_obj(user=user, image=uploaded_file)
+
+        assert image_obj.pk is not None
+        assert UserImage.objects.filter(user=user.userprofile).count() == 1
+        mock_apply_async.assert_any_call(args=(user.userprofile.account_tier.thumbnail_height, None, image_obj.pk))
+
+    def test_create_image_obj_for_premium_tier_user(
+            self, create_authenticated_user_with_basic_tier, mock_apply_async, create_premium_acc_tier):
+        user, _ = create_authenticated_user_with_basic_tier
+        premium_tier = create_premium_acc_tier
+        user.userprofile.account_tier = premium_tier
+
+        image_path = 'images/tests/test_images/test_img.jpg'
+        image = Image.open(image_path)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
+        image.save(tmp_file.name)
+        uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
+
+        image_obj = create_image_obj(user=user, image=uploaded_file)
+
+        assert image_obj.pk is not None
+        assert UserImage.objects.filter(user=user.userprofile).count() == 1
+        mock_apply_async.assert_any_call(args=(user.userprofile.account_tier.thumbnail_height, None, image_obj.pk))
+        mock_apply_async.assert_any_call(args=(400, None, image_obj.pk))
+
+    def test_create_image_obj_for_enterprise_tier_user(
+            self, create_authenticated_user_with_basic_tier, mock_apply_async, create_enterprise_acc_tier):
+        user, _ = create_authenticated_user_with_basic_tier
+        enterprise_tier = create_enterprise_acc_tier
+        user.userprofile.account_tier = enterprise_tier
+
+        image_path = 'images/tests/test_images/test_img.jpg'
+        image = Image.open(image_path)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
+        image.save(tmp_file.name)
+        uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
+
+        image_obj = create_image_obj(user=user, image=uploaded_file)
+
+        assert image_obj.pk is not None
+        assert UserImage.objects.filter(user=user.userprofile).count() == 1
+        mock_apply_async.assert_any_call(args=(user.userprofile.account_tier.thumbnail_height, None, image_obj.pk))
+        mock_apply_async.assert_any_call(args=(400, None, image_obj.pk))
+
+    def test_create_image_obj_for_custom_tier_user(
+            self, create_authenticated_user_with_basic_tier, mock_apply_async, create_custom_acc_tier):
+        user, _ = create_authenticated_user_with_basic_tier
+        custom_tier = create_custom_acc_tier
+        user.userprofile.account_tier = custom_tier
+
+        image_path = 'images/tests/test_images/test_img.jpg'
+        image = Image.open(image_path)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
+        image.save(tmp_file.name)
+        uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
+
+        image_obj = create_image_obj(user=user, image=uploaded_file)
+
+        assert image_obj.pk is not None
+        assert UserImage.objects.filter(user=user.userprofile).count() == 1
+        mock_apply_async.assert_any_call(
+            args=(user.userprofile.account_tier.thumbnail_height, user.userprofile.account_tier.thumbnail_width, image_obj.pk))
+
+
+
