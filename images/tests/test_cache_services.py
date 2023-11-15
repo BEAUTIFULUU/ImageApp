@@ -26,14 +26,14 @@ def create_basic_acc_tier():
 
 @pytest.fixture
 def create_enterprise_acc_tier():
-    basic_acc_tier = AccountTier.objects.create(
+    enterprise_acc_tier = AccountTier.objects.create(
         name='Enterprise',
         original_image_link=True,
         expiring_link=True,
         thumbnail_height=400,
         thumbnail_width=1
     )
-    return basic_acc_tier
+    return enterprise_acc_tier
 
 
 @pytest.fixture

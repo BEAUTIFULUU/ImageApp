@@ -1,11 +1,9 @@
 import os
 import tempfile
-
 import pytest
 from PIL import Image
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIClient
 from images.models import ImageThumbnail, AccountTier, UserImage
 from images.tasks import resize_image
@@ -24,40 +22,41 @@ def create_basic_acc_tier():
     )
     return basic_acc_tier
 
+
 @pytest.fixture
 def create_premium_acc_tier():
-    basic_acc_tier = AccountTier.objects.create(
+    premium_acc_tier = AccountTier.objects.create(
         name='Premium',
         original_image_link=True,
         expiring_link=False,
         thumbnail_height=400,
         thumbnail_width=1
     )
-    return basic_acc_tier
+    return premium_acc_tier
 
 
 @pytest.fixture
 def create_enterprise_acc_tier():
-    basic_acc_tier = AccountTier.objects.create(
+    enterprise_acc_tier = AccountTier.objects.create(
         name='Enterprise',
         original_image_link=True,
         expiring_link=True,
         thumbnail_height=400,
         thumbnail_width=1
     )
-    return basic_acc_tier
+    return enterprise_acc_tier
 
 
 @pytest.fixture
 def create_custom_acc_tier():
-    basic_acc_tier = AccountTier.objects.create(
+    custom_acc_tier = AccountTier.objects.create(
         name='600x400',
         original_image_link=True,
         expiring_link=False,
         thumbnail_height=600,
         thumbnail_width=500
     )
-    return basic_acc_tier
+    return custom_acc_tier
 
 
 @pytest.fixture
@@ -154,5 +153,3 @@ class TestResizing:
         assert os.path.exists(thumbnail.image_thumb.path)
         assert thumbnail.image_thumb.width == acc_tier_thb_height
         assert thumbnail.image_thumb.height == acc_tier_thb_width
-
-
