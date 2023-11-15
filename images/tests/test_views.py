@@ -50,11 +50,22 @@ def create_enterprise_acc_tier():
 
 
 @pytest.fixture
-def create_custom_acc_tier():
+def create_custom_acc_tier_without_exp_link():
     custom_acc_tier = AccountTier.objects.create(
         name='600x400',
         original_image_link=True,
         expiring_link=False,
+        thumbnail_height=600,
+        thumbnail_width=500
+    )
+    return custom_acc_tier
+
+@pytest.fixture
+def create_custom_acc_tier_with_exp_link():
+    custom_acc_tier = AccountTier.objects.create(
+        name='600x400',
+        original_image_link=True,
+        expiring_link=True,
         thumbnail_height=600,
         thumbnail_width=500
     )
@@ -297,6 +308,7 @@ class TestImageDetailsViewExpiringLinkPermissions:
         user, client = create_authenticated_user_with_basic_tier
         enterprise_tier = create_enterprise_acc_tier
         user.userprofile.account_tier = enterprise_tier
+        client.force_authenticate(user)
         url = 'image_details'
         data = {
             'image_link_time': 300
@@ -304,7 +316,131 @@ class TestImageDetailsViewExpiringLinkPermissions:
 
         response = client.post(reverse(url, kwargs={'image_id': image_obj.pk}), data=data, format='json')
         assert user.userprofile.account_tier == enterprise_tier
-        print(user.userprofile.account_tier)
         assert response.status_code == status.HTTP_201_CREATED
         temporary_link = get_temporary_link_from_cache(image_id=image_obj.pk)
         assert temporary_link is not None
+
+    def test_if_authenticated_user_with_custom_tier_with_no_exp_link_post_image_link_time_return_403(
+            self, create_authenticated_user_with_basic_tier, create_custom_acc_tier_without_exp_link, create_user_image_for_authenticated_user):
+        image_obj = create_user_image_for_authenticated_user
+        user, client = create_authenticated_user_with_basic_tier
+        custom_tier = create_custom_acc_tier_without_exp_link
+        user.userprofile.account_tier = custom_tier
+        client.force_authenticate(user=user)
+        url = 'image_details'
+        data = {
+            'image_link_time': 300
+        }
+
+        response = client.post(reverse(url, kwargs={'image_id': image_obj.pk}), data=data, format='json')
+        assert user.userprofile.account_tier == custom_tier
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        temporary_link = get_temporary_link_from_cache(image_id=image_obj.pk)
+        assert temporary_link is None
+
+    def test_if_authenticated_user_with_custom_tier_with_exp_link_post_image_link_time_return_403(
+            self, create_authenticated_user_with_basic_tier, create_custom_acc_tier_with_exp_link, create_user_image_for_authenticated_user):
+        image_obj = create_user_image_for_authenticated_user
+        user, client = create_authenticated_user_with_basic_tier
+        custom_tier = create_custom_acc_tier_with_exp_link
+        user.userprofile.account_tier = custom_tier
+        client.force_authenticate(user=user)
+        url = 'image_details'
+        data = {
+            'image_link_time': 300
+        }
+
+        response = client.post(reverse(url, kwargs={'image_id': image_obj.pk}), data=data, format='json')
+        assert user.userprofile.account_tier == custom_tier
+        assert response.status_code == status.HTTP_201_CREATED
+        temporary_link = get_temporary_link_from_cache(image_id=image_obj.pk)
+        assert temporary_link is not None
+
+    def test_if_admin_user_with_basic_acc_tier_post_image_link_time_return_403(
+            self, create_admin_user_with_basic_tier, create_user_image_for_admin_user, create_basic_acc_tier):
+        image_obj = create_user_image_for_admin_user
+        user, client = create_admin_user_with_basic_tier
+        basic_tier = create_basic_acc_tier
+        url = 'image_details'
+        data = {
+            'image_link_time': 300
+        }
+
+        response = client.post(reverse(url, kwargs={'image_id': image_obj.pk}), data=data, format='json')
+        assert user.userprofile.account_tier == basic_tier
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        temporary_link = get_temporary_link_from_cache(image_id=image_obj.pk)
+        assert temporary_link is None
+
+    def test_if_admin_user_with_premium_acc_tier_post_image_link_time_return_403(
+            self, create_admin_user_with_basic_tier, create_user_image_for_admin_user, create_premium_acc_tier):
+        image_obj = create_user_image_for_admin_user
+        user, client = create_admin_user_with_basic_tier
+        premium_tier = create_premium_acc_tier
+        user.userprofile.account_tier = premium_tier
+        client.force_authenticate(user=user)
+        url = 'image_details'
+        data = {
+            'image_link_time': 300
+        }
+
+        response = client.post(reverse(url, kwargs={'image_id': image_obj.pk}), data=data, format='json')
+        assert user.userprofile.account_tier == premium_tier
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        temporary_link = get_temporary_link_from_cache(image_id=image_obj.pk)
+        assert temporary_link is None
+
+    def test_if_admin_user_with_enterprise_acc_tier_post_image_link_time_return_201(
+            self, create_admin_user_with_basic_tier, create_user_image_for_admin_user, create_enterprise_acc_tier):
+        image_obj = create_user_image_for_admin_user
+        user, client = create_admin_user_with_basic_tier
+        enterprise_tier = create_enterprise_acc_tier
+        user.userprofile.account_tier = enterprise_tier
+        client.force_authenticate(user=user)
+        url = 'image_details'
+        data = {
+            'image_link_time': 300
+        }
+
+        response = client.post(reverse(url, kwargs={'image_id': image_obj.pk}), data=data, format='json')
+        assert user.userprofile.account_tier == enterprise_tier
+        assert response.status_code == status.HTTP_201_CREATED
+        temporary_link = get_temporary_link_from_cache(image_id=image_obj.pk)
+        assert temporary_link is not None
+
+    def test_if_admin_user_with_custom_tier_with_no_exp_link_post_image_link_time_return_403(
+            self, create_admin_user_with_basic_tier, create_custom_acc_tier_without_exp_link, create_user_image_for_admin_user):
+        image_obj = create_user_image_for_admin_user
+        user, client = create_admin_user_with_basic_tier
+        custom_tier = create_custom_acc_tier_without_exp_link
+        user.userprofile.account_tier = custom_tier
+        client.force_authenticate(user=user)
+        url = 'image_details'
+        data = {
+            'image_link_time': 300
+        }
+
+        response = client.post(reverse(url, kwargs={'image_id': image_obj.pk}), data=data, format='json')
+        assert user.userprofile.account_tier == custom_tier
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        temporary_link = get_temporary_link_from_cache(image_id=image_obj.pk)
+        assert temporary_link is None
+
+    def test_if_admin_user_with_custom_tier_with_exp_link_post_image_link_time_return_201(
+            self, create_admin_user_with_basic_tier, create_custom_acc_tier_with_exp_link, create_user_image_for_admin_user):
+        image_obj = create_user_image_for_admin_user
+        user, client = create_admin_user_with_basic_tier
+        custom_tier = create_custom_acc_tier_with_exp_link
+        user.userprofile.account_tier = custom_tier
+        client.force_authenticate(user=user)
+        url = 'image_details'
+        data = {
+            'image_link_time': 300
+        }
+
+        response = client.post(reverse(url, kwargs={'image_id': image_obj.pk}), data=data, format='json')
+        assert user.userprofile.account_tier == custom_tier
+        assert response.status_code == status.HTTP_201_CREATED
+        temporary_link = get_temporary_link_from_cache(image_id=image_obj.pk)
+        assert temporary_link is not None
+

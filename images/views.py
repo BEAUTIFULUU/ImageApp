@@ -44,8 +44,11 @@ class ImageDetailView(views.APIView):
 
     def post(self, request: Request, image_id: int) -> Response:
         user_profile = request.user.userprofile
-        is_enterprise = user_profile.account_tier == 'enterprise'
+        is_enterprise = user_profile.account_tier == 'Enterprise'
         has_expiring_link = user_profile.account_tier.expiring_link
+        print(f"Is Enterprise: {is_enterprise}")
+        print(f"Has Expiring Link: {has_expiring_link}")
+        print(user_profile.account_tier)
 
         if is_enterprise or has_expiring_link:
             serializer = ImageDetailInputSerializer(data=request.data)
