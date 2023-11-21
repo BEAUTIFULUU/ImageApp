@@ -27,16 +27,14 @@ class UserProfile(models.Model):
 class UserImage(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(
-        upload_to=user_image_upload_path, storage=GoogleCloudMediaFileStorage(),
-        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
+        upload_to=user_image_upload_path, validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
     upload_date = models.DateTimeField(auto_now_add=True)
 
 
 class ImageThumbnail(models.Model):
     user_image = models.ForeignKey(UserImage, on_delete=models.CASCADE, related_name='thumbnails')
     image_thumb = models.ImageField(
-        upload_to=thumbnail_upload_path, storage=GoogleCloudMediaFileStorage(),
-        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
+        upload_to=thumbnail_upload_path, validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
 
 
 class AccountTier(models.Model):

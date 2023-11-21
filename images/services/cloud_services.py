@@ -39,15 +39,6 @@ def thumbnail_upload_path(instance, filename: str) -> str:
     return cloud_storage_path
 
 
-def upload_image_to_gcs(image):
-    storage_client = storage.Client()
-    bucket_name = settings.GS_BUCKET_NAME
-    bucket = storage_client.bucket(bucket_name)
-    blob_name = image.image.name
-    blob = bucket.blob(blob_name)
-    blob.upload_from_file(ContentFile(image.image.read()))
-
-
 def get_public_url_for_image(image_id: int, is_thumbnail: bool = False) -> str:
     directory = 'user_thumbnails' if is_thumbnail else 'images'
     storage_client = storage.Client()

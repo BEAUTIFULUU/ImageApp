@@ -4,8 +4,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status, permissions, views, generics
 from rest_framework.parsers import MultiPartParser
-
-from ImageApp import settings
 from .models import UserImage
 from .serializers import ImageDetailOutputSerializer, ImageDetailInputSerializer, ImageOutputSerializer, \
     BasicImageOutputSerializer
@@ -30,11 +28,6 @@ class ImagesView(generics.ListCreateAPIView):
 
     def get_queryset(self) -> QuerySet[UserImage]:
         queryset = get_user_images(user=self.request.user.id)
-        for image in queryset:
-            image.image.url = get_public_url_for_image(image.id)
-            for thumbnail in image.thumbnails.all():
-                thumbnail.image_thumb.url = get_public_url_for_image(thumbnail.id, is_thumbnail=True)
-
         return queryset
 
     def create(self, request: Request, *args, **kwargs) -> Response:

@@ -3,12 +3,9 @@ import uuid
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-
-from images.services.cloud_services import get_public_url_for_image, upload_image_to_gcs
 from images.services.validation_services import validate_image_format
 from images.models import UserImage
 from images.tasks import resize_image
-from google.cloud import storage
 
 
 def get_image_details(image_id: int, user: User) -> UserImage:
@@ -28,7 +25,6 @@ def get_user_images(user: User) -> QuerySet:
 def create_image_obj(user, image: UserImage) -> UserImage:
     user_profile = user.userprofile
     validate_image_format(image)
-    upload_image_to_gcs(image=image)
     new_image_name = f'{uuid.uuid4()}{os.path.splitext(image.name)[-1]}'
     image_obj = UserImage(user=user_profile, image=image)
     image_obj.image.name = new_image_name
