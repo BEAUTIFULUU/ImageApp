@@ -1,4 +1,3 @@
-import os
 from rest_framework import serializers
 from django.core.validators import MinValueValidator, MaxValueValidator
 from .models import UserImage, ImageThumbnail
@@ -13,10 +12,7 @@ class ThumbnailOutputSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         image_thumb = instance.image_thumb.url
         if image_thumb:
-            base_url = os.environ.get('BASE_URL', '')
-            image_thumb_url = f'{base_url}{image_thumb}'
-            return image_thumb_url
-
+            return image_thumb
         return super().to_representation(instance)
 
 
@@ -28,16 +24,11 @@ class ImageOutputSerializer(serializers.ModelSerializer):
         fields = ['id', 'upload_date', 'image', 'image_thumb']
 
     def to_representation(self, instance):
-        if isinstance(instance, UserImage):
-            representation = super().to_representation(instance)
-            image = instance.image.url
-            if image:
-                base_url = os.environ.get('BASE_URL', '')
-                image_url = f'{base_url}{image}'
-                representation['image'] = image_url
-
-            return representation
-        return super().to_representation(instance)
+        representation = super().to_representation(instance)
+        image = instance.image.url
+        if image:
+            representation['image'] = image
+        return representation
 
 
 class BasicImageOutputSerializer(serializers.ModelSerializer):

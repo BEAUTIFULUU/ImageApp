@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
+from .services.cloud_services import user_image_upload_path, thumbnail_upload_path, GoogleCloudMediaFileStorage
 
 
 class UserProfile(models.Model):
@@ -26,14 +27,16 @@ class UserProfile(models.Model):
 class UserImage(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(
-        upload_to='images/', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
+        upload_to=user_image_upload_path, storage=GoogleCloudMediaFileStorage(),
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
     upload_date = models.DateTimeField(auto_now_add=True)
 
 
 class ImageThumbnail(models.Model):
     user_image = models.ForeignKey(UserImage, on_delete=models.CASCADE, related_name='thumbnails')
     image_thumb = models.ImageField(
-        upload_to='images/', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
+        upload_to=thumbnail_upload_path, storage=GoogleCloudMediaFileStorage(),
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'png'])])
 
 
 class AccountTier(models.Model):

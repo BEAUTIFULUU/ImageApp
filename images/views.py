@@ -4,10 +4,13 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status, permissions, views, generics
 from rest_framework.parsers import MultiPartParser
+
+from ImageApp import settings
 from .models import UserImage
 from .serializers import ImageDetailOutputSerializer, ImageDetailInputSerializer, ImageOutputSerializer, \
     BasicImageOutputSerializer
 from .services.basic_services import get_user_images, get_image_details, delete_image, create_image_obj
+from .services.cloud_services import get_public_url_for_image
 from .services.expiring_link_services import generate_image_temporary_link
 
 
@@ -26,11 +29,18 @@ class ImagesView(generics.ListCreateAPIView):
             return BasicImageOutputSerializer
 
     def get_queryset(self) -> QuerySet[UserImage]:
-        return get_user_images(user=self.request.user.id)
+        queryset = get_user_images(user=self.request.user.id)
+        for image in queryset:
+            image.image.url = get_public_url_for_image(image.id)
+            for thumbnail in image.thumbnails.all():
+                thumbnail.image_thumb.url = get_public_url_for_image(thumbnail.id, is_thumbnail=True)
+
+        return queryset
 
     def create(self, request: Request, *args, **kwargs) -> Response:
         image = request.FILES.get('image')
-        create_image_obj(user=request.user, image=image)
+        uploaded_img = create_image_obj(user=request.user, image=image)
+        get_public_url_for_image(image_id=uploaded_img.pk)
         return Response({'message': 'Image uploaded successfully.'}, status=status.HTTP_201_CREATED)
 
 
@@ -46,9 +56,6 @@ class ImageDetailView(views.APIView):
         user_profile = request.user.userprofile
         is_enterprise = user_profile.account_tier == 'Enterprise'
         has_expiring_link = user_profile.account_tier.expiring_link
-        print(f"Is Enterprise: {is_enterprise}")
-        print(f"Has Expiring Link: {has_expiring_link}")
-        print(user_profile.account_tier)
 
         if is_enterprise or has_expiring_link:
             serializer = ImageDetailInputSerializer(data=request.data)

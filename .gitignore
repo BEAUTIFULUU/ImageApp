@@ -5,3 +5,5 @@ db.sqlite3
 *.log
 
 media/
+
+gc_cred.json

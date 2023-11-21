@@ -129,9 +129,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = 'media/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -189,3 +186,7 @@ WHITELISTED_IMAGE_TYPES = {
 }
 
 CELERY_TASK_ALWAYS_EAGER = True
+
+GS_BUCKET_NAME = os.environ['GS_BUCKET_NAME']
+DEFAULT_FILE_STORAGE = 'images.services.cloud_services.GoogleCloudStorage'
+MEDIA_URL = 'https://storage.cloud.google.com/{}/'.format(GS_BUCKET_NAME)
