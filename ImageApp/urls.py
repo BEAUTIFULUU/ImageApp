@@ -28,6 +28,3 @@ urlpatterns = [
     path('', include('images.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL)
