@@ -40,16 +40,17 @@ class ImagesView(generics.ListCreateAPIView):
 class ImageDetailView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request: Request, image_id: int) -> Response:
-        user_profile = self.request.user.userprofile
+    def get(self, request, image_id):
+        user_profile = request.user.userprofile
         account_tier = user_profile.account_tier
         image_obj = get_image_details(image_id=image_id, user=request.user.id)
-        if account_tier and (account_tier.name in ['Premium', 'Enterprise'] or account_tier.original_image_link):
-            serializer = ImageDetailOutputSerializer(image_obj)
-            return Response(serializer.data)
-        else:
-            serializer = BasicImageDetailOutputSerializer(image_obj)
-            return Response(serializer.data)
+
+        serializer_class = ImageDetailOutputSerializer if (
+            account_tier and (account_tier.name in ['Premium', 'Enterprise'] or account_tier.original_image_link)
+        ) else BasicImageDetailOutputSerializer
+
+        serializer = serializer_class(image_obj)
+        return Response(serializer.data)
 
     def post(self, request: Request, image_id: int) -> Response:
         user_profile = request.user.userprofile
