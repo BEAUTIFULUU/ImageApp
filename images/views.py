@@ -6,7 +6,7 @@ from rest_framework import status, permissions, views, generics
 from rest_framework.parsers import MultiPartParser
 from .models import UserImage
 from .serializers import ImageDetailOutputSerializer, ImageDetailInputSerializer, ImageOutputSerializer, \
-    BasicImageOutputSerializer
+    BasicImageOutputSerializer, BasicImageDetailOutputSerializer
 from .services.basic_services import get_user_images, get_image_details, delete_image, create_image_obj
 from .services.cloud_services import get_public_url_for_image
 from .services.expiring_link_services import generate_image_temporary_link
@@ -41,9 +41,15 @@ class ImageDetailView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request: Request, image_id: int) -> Response:
+        user_profile = self.request.user.userprofile
+        account_tier = user_profile.account_tier
         image_obj = get_image_details(image_id=image_id, user=request.user.id)
-        serializer = ImageDetailOutputSerializer(image_obj)
-        return Response(serializer.data)
+        if account_tier and (account_tier.name in ['Premium', 'Enterprise'] or account_tier.original_image_link):
+            serializer = ImageDetailOutputSerializer(image_obj)
+            return Response(serializer.data)
+        else:
+            serializer = BasicImageDetailOutputSerializer(image_obj)
+            return Response(serializer.data)
 
     def post(self, request: Request, image_id: int) -> Response:
         user_profile = request.user.userprofile

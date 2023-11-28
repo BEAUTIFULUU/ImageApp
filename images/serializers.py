@@ -44,6 +44,18 @@ class ImageDetailInputSerializer(serializers.Serializer):
         validators=[MinValueValidator(300), MaxValueValidator(30000)], required=True)
 
 
+class BasicImageDetailOutputSerializer(serializers.ModelSerializer):
+    image_thumb = ThumbnailOutputSerializer(many=True, read_only=True, source='thumbnails')
+
+    class Meta:
+        model = UserImage
+        fields = [
+            'id',
+            'upload_date',
+            'image_thumb'
+        ]
+
+
 class ImageDetailOutputSerializer(serializers.ModelSerializer):
     original_image_size = serializers.SerializerMethodField()
 
