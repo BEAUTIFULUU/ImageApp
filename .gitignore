@@ -7,3 +7,5 @@ db.sqlite3
 media/
 
 gc_cred.json
+
+docker-compose.prod.yml
