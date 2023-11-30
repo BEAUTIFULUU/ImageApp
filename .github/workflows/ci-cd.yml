@@ -8,8 +8,38 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: python:latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: 5432
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
+    - name: Install PostgreSQL client
+      run: |
+        if ! command -v psql &> /dev/null; then
+          apt-get update
+          apt-get install --yes postgresql-client
+        fi
+
+    - name: Query database
+      run: psql -h postgres -d ${{ secrets.POSTGRES_DB }} -U ${{ secrets.POSTGRES_USER }} -c 'SELECT 1;'
+      env:
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+
     - name: Checkout code
       uses: actions/checkout@v2
 
