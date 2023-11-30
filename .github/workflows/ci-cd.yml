@@ -14,10 +14,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          DB_HOST: db
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
         ports:
           - 5432:5432
         options: >-
@@ -35,9 +34,9 @@ jobs:
         fi
 
     - name: Query database
-      run: psql -h postgres -d postgres -U postgres -c 'SELECT 1;'
+      run: psql -h localhost -d test_tb -U test_user -c 'SELECT 1;'
       env:
-        PGPASSWORD: postgres
+        PGPASSWORD: test_password
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -54,7 +53,7 @@ jobs:
 
     - name: Run tests
       run: |
-        python manage.py run pytest
+        python manage.py run pytest --settings=ImageApp.test_settings
 
     - name: Run linters
       run: |
