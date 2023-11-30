@@ -34,7 +34,7 @@ jobs:
         fi
 
     - name: Query database
-      run: psql -h localhost -d test_tb -U test_user -c 'SELECT 1;'
+      run: psql -h postgres -d test_tb -U test_user -c 'SELECT 1;'
       env:
         PGPASSWORD: test_password
 
