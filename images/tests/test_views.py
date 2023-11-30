@@ -60,6 +60,7 @@ def create_custom_acc_tier_without_exp_link():
     )
     return custom_acc_tier
 
+
 @pytest.fixture
 def create_custom_acc_tier_with_exp_link():
     custom_acc_tier = AccountTier.objects.create(
@@ -321,7 +322,8 @@ class TestImageDetailsViewExpiringLinkPermissions:
         assert temporary_link is not None
 
     def test_if_authenticated_user_with_custom_tier_with_no_exp_link_post_image_link_time_return_403(
-            self, create_authenticated_user_with_basic_tier, create_custom_acc_tier_without_exp_link, create_user_image_for_authenticated_user):
+            self, create_authenticated_user_with_basic_tier, create_custom_acc_tier_without_exp_link,
+            create_user_image_for_authenticated_user):
         image_obj = create_user_image_for_authenticated_user
         user, client = create_authenticated_user_with_basic_tier
         custom_tier = create_custom_acc_tier_without_exp_link
@@ -339,7 +341,8 @@ class TestImageDetailsViewExpiringLinkPermissions:
         assert temporary_link is None
 
     def test_if_authenticated_user_with_custom_tier_with_exp_link_post_image_link_time_return_403(
-            self, create_authenticated_user_with_basic_tier, create_custom_acc_tier_with_exp_link, create_user_image_for_authenticated_user):
+            self, create_authenticated_user_with_basic_tier, create_custom_acc_tier_with_exp_link,
+            create_user_image_for_authenticated_user):
         image_obj = create_user_image_for_authenticated_user
         user, client = create_authenticated_user_with_basic_tier
         custom_tier = create_custom_acc_tier_with_exp_link
@@ -409,7 +412,8 @@ class TestImageDetailsViewExpiringLinkPermissions:
         assert temporary_link is not None
 
     def test_if_admin_user_with_custom_tier_with_no_exp_link_post_image_link_time_return_403(
-            self, create_admin_user_with_basic_tier, create_custom_acc_tier_without_exp_link, create_user_image_for_admin_user):
+            self, create_admin_user_with_basic_tier, create_custom_acc_tier_without_exp_link,
+            create_user_image_for_admin_user):
         image_obj = create_user_image_for_admin_user
         user, client = create_admin_user_with_basic_tier
         custom_tier = create_custom_acc_tier_without_exp_link
@@ -427,7 +431,8 @@ class TestImageDetailsViewExpiringLinkPermissions:
         assert temporary_link is None
 
     def test_if_admin_user_with_custom_tier_with_exp_link_post_image_link_time_return_201(
-            self, create_admin_user_with_basic_tier, create_custom_acc_tier_with_exp_link, create_user_image_for_admin_user):
+            self, create_admin_user_with_basic_tier, create_custom_acc_tier_with_exp_link,
+            create_user_image_for_admin_user):
         image_obj = create_user_image_for_admin_user
         user, client = create_admin_user_with_basic_tier
         custom_tier = create_custom_acc_tier_with_exp_link
@@ -443,4 +448,3 @@ class TestImageDetailsViewExpiringLinkPermissions:
         assert response.status_code == status.HTTP_201_CREATED
         temporary_link = get_temporary_link_from_cache(image_id=image_obj.pk)
         assert temporary_link is not None
-
