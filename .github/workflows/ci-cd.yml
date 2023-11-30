@@ -53,12 +53,14 @@ jobs:
 
     - name: Run tests
       run: |
-          export DB_NAME=test_tb
-          export DB_USER=test_user
-          export DB_PASSWORD=test_password
-          export DB_HOST=db
-          export DB_PORT=5432
-          python manage.py run pytest --settings=ImageApp.test_settings
+        export DJANGO_SETTINGS_MODULE=your_app.test_settings
+        python manage.py test
+      env:
+        PGPASSWORD: test_password
+        POSTGRES_DB: test_tb
+        POSTGRES_USER: test_user
+        POSTGRES_PASSWORD: test_password
+
 
     - name: Run linters
       run: |
