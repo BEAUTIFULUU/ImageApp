@@ -53,11 +53,11 @@ jobs:
 
     - name: Run tests
       run: |
-        export DJANGO_SETTINGS_MODULE=your_app.test_settings
+        export DJANGO_SETTINGS_MODULE=ImageApp.test_settings
         python manage.py test
       env:
         PGPASSWORD: test_password
-        POSTGRES_DB: test_tb
+        POSTGRES_DB: test_db
         POSTGRES_USER: test_user
         POSTGRES_PASSWORD: test_password
 
