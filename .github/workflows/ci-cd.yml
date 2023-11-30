@@ -35,7 +35,7 @@ jobs:
     - name: Query database
       run: psql -h postgres -d ${{ secrets.POSTGRES_DB }} -U ${{ secrets.POSTGRES_USER }} -c 'SELECT 1;'
       env:
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
     - name: Checkout code
       uses: actions/checkout@v2
