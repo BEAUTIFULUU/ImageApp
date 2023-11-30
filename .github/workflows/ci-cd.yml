@@ -53,7 +53,12 @@ jobs:
 
     - name: Run tests
       run: |
-        python manage.py run pytest --settings=ImageApp.test_settings
+          export DB_NAME=test_tb
+          export DB_USER=test_user
+          export DB_PASSWORD=test_password
+          export DB_HOST=db
+          export DB_PORT=5432
+          python manage.py run pytest --settings=ImageApp.test_settings
 
     - name: Run linters
       run: |
