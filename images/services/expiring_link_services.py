@@ -5,7 +5,7 @@ from images.models import UserImage
 from images.services.cache_services import store_temporary_link_in_cache, get_temporary_link_from_cache
 
 
-def generate_image_temporary_link(image_id: int, time: int):
+def generate_image_temporary_link(image_id: int, time: int) -> str:
     existing_link = get_temporary_link_from_cache(image_id=image_id)
     if existing_link:
         return existing_link
