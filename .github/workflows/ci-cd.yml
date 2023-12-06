@@ -38,11 +38,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Set up environment variables from secret
+    - name: Create env file
       run: |
-        echo "$DEV_ENV" > dev.env
+        echo "${{ secrets.ENV_FILE }}" > dev.env
         export DJANGO_SETTINGS_MODULE=ImageApp.test_settings
-        python manage.py pytest
+        python manage.py test
+      env:
+        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
     - name: Run linters
       run: |
