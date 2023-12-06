@@ -38,19 +38,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run tests
+    - name: Set up environment variables from secret
       run: |
+        echo "$DEV_ENV" > dev.env
         export DJANGO_SETTINGS_MODULE=ImageApp.test_settings
-        export DB_NAME=test_db
-        export DB_USER=test_user
-        export DB_PASSWORD=test_password
-        export DB_HOST=db
-        export DB_PORT=5432
-        python manage.py test
-      env:
-        POSTGRES_DB: test_db
-        POSTGRES_USER: test_user
-        POSTGRES_PASSWORD: test_password
+        python manage.py pytest
 
     - name: Run linters
       run: |
