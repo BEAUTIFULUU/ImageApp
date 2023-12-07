@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -8,6 +8,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
 
     steps:
     - name: Checkout code
@@ -33,9 +43,9 @@ jobs:
       run: |
         python manage.py test
       env:
-        POSTGRES_DB: ${{ secrets.DB_NAME }}
-        POSTGRES_USER: ${{ secrets.DB_USER }}
-        POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        POSTGRES_DB: test_db
+        POSTGRES_USER: test_user
+        POSTGRES_PASSWORD: test_password
         GC_BUCKET_NAME: ${{ secrets.GS_BUCKET_NAME }}
 
     - name: Run linters
@@ -52,3 +62,4 @@ jobs:
       run: |
         pip install bandit
         bandit -r .
+
