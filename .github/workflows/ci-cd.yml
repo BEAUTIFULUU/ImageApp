@@ -40,9 +40,7 @@ jobs:
 
     - name: Set up environment variables from ENV_FILE
       run: |
-        echo "${{ secrets.ENV_FILE }}" > dev.env
-        export $(cat dev.env | xargs)
-        echo "DJANGO_SETTINGS_MODULE=ImageApp.test_settings" >> $GITHUB_ENV
+        echo "${{ secrets.ENV_FILE }}" > .env
 
     - name: Run tests
       run: |
