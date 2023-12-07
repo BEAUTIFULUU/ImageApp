@@ -40,7 +40,7 @@ jobs:
 
     - name: Run tests
       run: |
-        python manage.py pytest
+        pytest
       env:
         DB_NAME: test_db
         DB_USER: test_user
