@@ -1,28 +1,13 @@
-name: CI
+name: CI/CD
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
     - name: Checkout code
@@ -38,20 +23,25 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Create env file
+    - name: Set up environment variables from ENV_FILE
       run: |
         echo "${{ secrets.ENV_FILE }}" > dev.env
-        export DJANGO_SETTINGS_MODULE=ImageApp.test_settings
+        export $(cat dev.env | xargs)
+        echo "DJANGO_SETTINGS_MODULE=ImageApp.test_settings" >> $GITHUB_ENV
+
+    - name: Run tests
+      run: |
         python manage.py test
       env:
-        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_DB: ${{ secrets.DB_NAME }}
+        POSTGRES_USER: ${{ secrets.DB_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        GC_BUCKET_NAME: ${{ secrets.GS_BUCKET_NAME }}
 
     - name: Run linters
       run: |
         pip install flake8
-        flake .
+        flake8 .
 
     - name: Check code formatting
       run: |
