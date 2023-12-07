@@ -42,9 +42,11 @@ jobs:
       run: |
         python manage.py test
       env:
-        POSTGRES_DB: test_db
+        DB_NAME: test_db
         POSTGRES_USER: test_user
-        POSTGRES_PASSWORD: test_password
+        DB_USER: test_password
+        DB_HOST: postgres
+        DB_PORT: 5432
 
     - name: Run linters
       run: |
