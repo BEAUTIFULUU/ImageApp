@@ -1,18 +1,15 @@
-import os
 import uuid
 from urllib.parse import urljoin
 from django.conf import settings
-from django.core.files.base import ContentFile
 from django.utils.deconstruct import deconstructible
 from storages.backends.gcloud import GoogleCloudStorage
-from storages.utils import clean_name, setting
+from storages.utils import clean_name
 from google.cloud import storage
-from ImageApp import settings
 
 
 @deconstructible
 class GoogleCloudMediaFileStorage(GoogleCloudStorage):
-    bucket_name = setting(os.environ['GS_BUCKET_NAME'])
+    bucket_name = settings.GS_BUCKET_NAME
 
     def url(self, name):
         return urljoin(settings.MEDIA_URL, name)
