@@ -45,7 +45,7 @@ jobs:
         DB_NAME: test_db
         DB_USER: test_user
         DB_PASSWORD: test_password
-        DB_HOST: postgres
+        DB_HOST: localhost
         DB_PORT: 5432
         SECRET_KEY:  abc
         BASE_URL: http://127.0.0.1:8081/
