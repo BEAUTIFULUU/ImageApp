@@ -182,7 +182,7 @@ WHITELISTED_IMAGE_TYPES = {
 
 CELERY_TASK_ALWAYS_EAGER = True
 
-GS_BUCKET_NAME = os.environ['GS_BUCKET_NAME']
+GS_BUCKET_NAME = os.environ.get('GS_BUCKET_NAME')
 GOOGLE_CLOUD_STORAGE_URL = f'http://storage.googleapis.com/{GS_BUCKET_NAME}'
 GOOGLE_CLOUD_STORAGE_DEFAULT_CACHE_CONTROL = 'public, max-age: 7200'
 STORAGES = {"default": {"BACKEND": "storages.backends.gcloud.GoogleCloudStorage"},

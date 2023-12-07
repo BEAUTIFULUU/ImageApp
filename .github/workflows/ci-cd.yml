@@ -31,16 +31,12 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.10
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-
-    - name: Set up environment variables from ENV_FILE
-      run: |
-        echo "${{ secrets.ENV_FILE }}" > .env
 
     - name: Run tests
       run: |
@@ -49,20 +45,16 @@ jobs:
         POSTGRES_DB: test_db
         POSTGRES_USER: test_user
         POSTGRES_PASSWORD: test_password
-        GC_BUCKET_NAME: ${{ secrets.GS_BUCKET_NAME }}
 
     - name: Run linters
       run: |
-        pip install flake8
         flake8 .
 
     - name: Check code formatting
       run: |
-        pip install black
         black --check .
 
     - name: Check security vulnerabilities
       run: |
-        pip install bandit
         bandit -r .
 
