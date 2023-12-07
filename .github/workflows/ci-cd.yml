@@ -43,8 +43,8 @@ jobs:
         python manage.py test
       env:
         DB_NAME: test_db
-        POSTGRES_USER: test_user
-        DB_USER: test_password
+        DB_USER: test_user
+        DB_PASSWORD: test_password
         DB_HOST: postgres
         DB_PORT: 5432
 
