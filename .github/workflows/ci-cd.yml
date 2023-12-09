@@ -47,7 +47,7 @@ jobs:
         DB_PASSWORD: test_password
         DB_HOST: localhost
         DB_PORT: 5432
-        SECRET_KEY:  abc
+        SECRET_KEY: abc
         BASE_URL: http://127.0.0.1:8081/
     - name: Run linters
       run: |

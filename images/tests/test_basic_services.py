@@ -7,7 +7,7 @@ from django.http import Http404
 from unittest.mock import patch
 from rest_framework.test import APIClient
 from ..services.basic_services import get_image_details, get_user_images, delete_image, create_image_obj
-from ..models import UserImage, UserProfile, AccountTier, ImageThumbnail
+from ..models import UserImage, UserProfile, AccountTier
 
 
 User = get_user_model()
