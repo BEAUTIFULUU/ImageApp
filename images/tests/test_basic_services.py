@@ -128,13 +128,13 @@ class TestUserImageLogic:
                                                   mock_google_client):
         user, _ = create_authenticated_user_with_basic_tier
 
-        image_path = 'images/tests/test_images/test_img.jpg'
-        image = Image.open(image_path)
-        tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
-        image.save(tmp_file.name)
-        uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
-
         with mock_google_client:
+            image_path = 'images/tests/test_images/test_img.jpg'
+            image = Image.open(image_path)
+            tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
+            image.save(tmp_file.name)
+            uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
+
             image_obj = create_image_obj(user=user, image=uploaded_file)
 
         assert image_obj.pk is not None
@@ -148,13 +148,13 @@ class TestUserImageLogic:
         premium_tier = create_premium_acc_tier
         user.userprofile.account_tier = premium_tier
 
-        image_path = 'images/tests/test_images/test_img.jpg'
-        image = Image.open(image_path)
-        tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
-        image.save(tmp_file.name)
-        uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
-
         with mock_google_client:
+            image_path = 'images/tests/test_images/test_img.jpg'
+            image = Image.open(image_path)
+            tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
+            image.save(tmp_file.name)
+            uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
+
             image_obj = create_image_obj(user=user, image=uploaded_file)
 
         assert image_obj.pk is not None
