@@ -7,10 +7,7 @@ from django.core.validators import (
     MinValueValidator,
     MaxValueValidator,
 )
-from .services.cloud_services import (
-    user_image_upload_path,
-    thumbnail_upload_path
-)
+from .services.cloud_services import user_image_upload_path, thumbnail_upload_path
 
 
 class UserProfile(models.Model):
