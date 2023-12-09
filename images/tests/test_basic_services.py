@@ -8,7 +8,6 @@ from unittest.mock import patch
 from rest_framework.test import APIClient
 from ..services.basic_services import get_image_details, get_user_images, delete_image, create_image_obj
 from ..models import UserImage, UserProfile, AccountTier
-from google.cloud.storage import Client
 
 User = get_user_model()
 
@@ -135,7 +134,7 @@ class TestUserImageLogic:
         mock_apply_async.assert_any_call(args=(user.userprofile.account_tier.thumbnail_height, None, image_obj.pk))
 
     def test_create_image_obj_for_premium_tier_user(
-            self, create_authenticated_user_with_basic_tier, create_premium_acc_tier):
+            self, create_authenticated_user_with_basic_tier, create_premium_acc_tier, mock_apply_async):
         user, _ = create_authenticated_user_with_basic_tier
         premium_tier = create_premium_acc_tier
         user.userprofile.account_tier = premium_tier
