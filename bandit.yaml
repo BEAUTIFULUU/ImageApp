@@ -1,0 +1,3 @@
+bandit_config:
+  exclude:
+    - ./tests/*
