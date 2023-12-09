@@ -8,7 +8,7 @@ from unittest.mock import patch
 from rest_framework.test import APIClient
 from ..services.basic_services import get_image_details, get_user_images, delete_image, create_image_obj
 from ..models import UserImage, UserProfile, AccountTier
-from google.cloud import storage
+from google.cloud.storage import Client
 
 User = get_user_model()
 
@@ -21,7 +21,7 @@ def mock_apply_async():
 
 @pytest.fixture
 def mock_google_client():
-    with patch.object(storage, 'Client') as mock:
+    with Client(project='ImageApp') as mock:
         yield mock
 
 
