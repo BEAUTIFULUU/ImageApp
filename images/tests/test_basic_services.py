@@ -8,6 +8,7 @@ from unittest.mock import patch
 from rest_framework.test import APIClient
 from ..services.basic_services import get_image_details, get_user_images, delete_image, create_image_obj
 from ..models import UserImage, UserProfile, AccountTier
+from google.cloud.storage import Client
 
 User = get_user_model()
 
@@ -20,7 +21,7 @@ def mock_apply_async():
 
 @pytest.fixture
 def mock_google_client():
-    with patch('google.cloud.storage.Client') as mock:
+    with patch.object(Client, '__init__') as mock:
         yield mock
 
 
@@ -128,13 +129,13 @@ class TestUserImageLogic:
                                                   mock_google_client):
         user, _ = create_authenticated_user_with_basic_tier
 
-        with mock_google_client:
-            image_path = 'images/tests/test_images/test_img.jpg'
-            image = Image.open(image_path)
-            tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
-            image.save(tmp_file.name)
-            uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
+        image_path = 'images/tests/test_images/test_img.jpg'
+        image = Image.open(image_path)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
+        image.save(tmp_file.name)
+        uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
 
+        with mock_google_client:
             image_obj = create_image_obj(user=user, image=uploaded_file)
 
         assert image_obj.pk is not None
@@ -148,13 +149,13 @@ class TestUserImageLogic:
         premium_tier = create_premium_acc_tier
         user.userprofile.account_tier = premium_tier
 
-        with mock_google_client:
-            image_path = 'images/tests/test_images/test_img.jpg'
-            image = Image.open(image_path)
-            tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
-            image.save(tmp_file.name)
-            uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
+        image_path = 'images/tests/test_images/test_img.jpg'
+        image = Image.open(image_path)
+        tmp_file = tempfile.NamedTemporaryFile(suffix=".jpg")
+        image.save(tmp_file.name)
+        uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
 
+        with mock_google_client:
             image_obj = create_image_obj(user=user, image=uploaded_file)
 
         assert image_obj.pk is not None
