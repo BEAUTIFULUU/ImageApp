@@ -9,13 +9,18 @@ from rest_framework.test import APIClient
 from ..services.basic_services import get_image_details, get_user_images, delete_image, create_image_obj
 from ..models import UserImage, UserProfile, AccountTier
 
-
 User = get_user_model()
 
 
 @pytest.fixture
 def mock_apply_async():
     with patch('images.services.basic_services.resize_image.apply_async') as mock:
+        yield mock
+
+
+@pytest.fixture
+def mock_google_client():
+    with patch('google.cloud.storage.Client') as mock:
         yield mock
 
 
@@ -119,7 +124,8 @@ class TestUserImageLogic:
 
         assert not UserImage.objects.filter(pk=user_image.pk).exists()
 
-    def test_create_image_obj_for_basic_tier_user(self, create_authenticated_user_with_basic_tier, mock_apply_async):
+    def test_create_image_obj_for_basic_tier_user(self, create_authenticated_user_with_basic_tier, mock_apply_async,
+                                                  mock_google_client):
         user, _ = create_authenticated_user_with_basic_tier
 
         image_path = 'images/tests/test_images/test_img.jpg'
@@ -128,14 +134,16 @@ class TestUserImageLogic:
         image.save(tmp_file.name)
         uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
 
-        image_obj = create_image_obj(user=user, image=uploaded_file)
+        with mock_google_client:
+            image_obj = create_image_obj(user=user, image=uploaded_file)
 
         assert image_obj.pk is not None
         assert UserImage.objects.filter(user=user.userprofile).count() == 1
         mock_apply_async.assert_any_call(args=(user.userprofile.account_tier.thumbnail_height, None, image_obj.pk))
 
     def test_create_image_obj_for_premium_tier_user(
-            self, create_authenticated_user_with_basic_tier, mock_apply_async, create_premium_acc_tier):
+            self, create_authenticated_user_with_basic_tier, mock_apply_async, create_premium_acc_tier,
+            mock_google_client):
         user, _ = create_authenticated_user_with_basic_tier
         premium_tier = create_premium_acc_tier
         user.userprofile.account_tier = premium_tier
@@ -146,7 +154,8 @@ class TestUserImageLogic:
         image.save(tmp_file.name)
         uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
 
-        image_obj = create_image_obj(user=user, image=uploaded_file)
+        with mock_google_client:
+            image_obj = create_image_obj(user=user, image=uploaded_file)
 
         assert image_obj.pk is not None
         assert UserImage.objects.filter(user=user.userprofile).count() == 1
@@ -189,7 +198,5 @@ class TestUserImageLogic:
         assert image_obj.pk is not None
         assert UserImage.objects.filter(user=user.userprofile).count() == 1
         mock_apply_async.assert_any_call(
-            args=(user.userprofile.account_tier.thumbnail_height, user.userprofile.account_tier.thumbnail_width, image_obj.pk))
-
-
-
+            args=(user.userprofile.account_tier.thumbnail_height, user.userprofile.account_tier.thumbnail_width,
+                  image_obj.pk))
