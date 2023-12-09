@@ -3,12 +3,12 @@ import tempfile
 from PIL import Image
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http import Http404
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from ..models import UserImage, UserProfile, AccountTier, ImageThumbnail
+from ..models import UserImage, AccountTier
 from ..services.cache_services import get_temporary_link_from_cache
+
 
 User = get_user_model()
 

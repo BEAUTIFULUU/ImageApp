@@ -20,12 +20,6 @@ def mock_apply_async():
 
 
 @pytest.fixture
-def mock_google_client():
-    with Client(project='ImageApp') as mock:
-        yield mock
-
-
-@pytest.fixture
 def create_basic_acc_tier():
     basic_acc_tier = AccountTier.objects.create(
         name='Basic',
@@ -125,8 +119,7 @@ class TestUserImageLogic:
 
         assert not UserImage.objects.filter(pk=user_image.pk).exists()
 
-    def test_create_image_obj_for_basic_tier_user(self, create_authenticated_user_with_basic_tier, mock_apply_async,
-                                                  mock_google_client):
+    def test_create_image_obj_for_basic_tier_user(self, create_authenticated_user_with_basic_tier, mock_apply_async):
         user, _ = create_authenticated_user_with_basic_tier
 
         image_path = 'images/tests/test_images/test_img.jpg'
@@ -135,16 +128,14 @@ class TestUserImageLogic:
         image.save(tmp_file.name)
         uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
 
-        with mock_google_client:
-            image_obj = create_image_obj(user=user, image=uploaded_file)
+        image_obj = create_image_obj(user=user, image=uploaded_file)
 
         assert image_obj.pk is not None
         assert UserImage.objects.filter(user=user.userprofile).count() == 1
         mock_apply_async.assert_any_call(args=(user.userprofile.account_tier.thumbnail_height, None, image_obj.pk))
 
     def test_create_image_obj_for_premium_tier_user(
-            self, create_authenticated_user_with_basic_tier, mock_apply_async, create_premium_acc_tier,
-            mock_google_client):
+            self, create_authenticated_user_with_basic_tier, create_premium_acc_tier):
         user, _ = create_authenticated_user_with_basic_tier
         premium_tier = create_premium_acc_tier
         user.userprofile.account_tier = premium_tier
@@ -155,8 +146,7 @@ class TestUserImageLogic:
         image.save(tmp_file.name)
         uploaded_file = SimpleUploadedFile("test_image.jpg", tmp_file.read(), content_type="image/jpg")
 
-        with mock_google_client:
-            image_obj = create_image_obj(user=user, image=uploaded_file)
+        image_obj = create_image_obj(user=user, image=uploaded_file)
 
         assert image_obj.pk is not None
         assert UserImage.objects.filter(user=user.userprofile).count() == 1

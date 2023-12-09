@@ -49,6 +49,8 @@ jobs:
         DB_PORT: 5432
         SECRET_KEY: abc
         BASE_URL: http://127.0.0.1:8081/
+        GS_BUCKET_NAME: ${{ secrets.GS_BUCKET_NAME }}
+
     - name: Run linters
       run: |
         flake8 .
