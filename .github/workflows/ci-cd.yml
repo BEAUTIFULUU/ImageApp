@@ -50,7 +50,7 @@ jobs:
         SECRET_KEY: abc
         BASE_URL: http://127.0.0.1:8081/
         GS_BUCKET_NAME: ${{ secrets.GS_BUCKET_NAME }}
-
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
     - name: Run linters
       run: |
         flake8 .
