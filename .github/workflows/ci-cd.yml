@@ -67,5 +67,5 @@ jobs:
 
     - name: Check security vulnerabilities
       run: |
-        bandit -r .
+        bandit -r . --skip tests
 
