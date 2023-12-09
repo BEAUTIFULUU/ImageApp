@@ -6,20 +6,35 @@ import images.services.cloud_services
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0025_alter_accounttier_name'),
+        ("images", "0025_alter_accounttier_name"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='imagethumbnail',
-            name='image_thumb',
-            field=models.ImageField(storage=images.services.cloud_services.GoogleCloudMediaFileStorage(), upload_to=images.services.cloud_services.thumbnail_upload_path, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['jpg', 'png'])]),
+            model_name="imagethumbnail",
+            name="image_thumb",
+            field=models.ImageField(
+                storage=images.services.cloud_services.GoogleCloudMediaFileStorage(),
+                upload_to=images.services.cloud_services.thumbnail_upload_path,
+                validators=[
+                    django.core.validators.FileExtensionValidator(
+                        allowed_extensions=["jpg", "png"]
+                    )
+                ],
+            ),
         ),
         migrations.AlterField(
-            model_name='userimage',
-            name='image',
-            field=models.ImageField(storage=images.services.cloud_services.GoogleCloudMediaFileStorage(), upload_to=images.services.cloud_services.user_image_upload_path, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['jpg', 'png'])]),
+            model_name="userimage",
+            name="image",
+            field=models.ImageField(
+                storage=images.services.cloud_services.GoogleCloudMediaFileStorage(),
+                upload_to=images.services.cloud_services.user_image_upload_path,
+                validators=[
+                    django.core.validators.FileExtensionValidator(
+                        allowed_extensions=["jpg", "png"]
+                    )
+                ],
+            ),
         ),
     ]

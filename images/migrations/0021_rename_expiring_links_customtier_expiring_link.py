@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0020_remove_imagethumbnail_custom_tier'),
+        ("images", "0020_remove_imagethumbnail_custom_tier"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='customtier',
-            old_name='expiring_links',
-            new_name='expiring_link',
+            model_name="customtier",
+            old_name="expiring_links",
+            new_name="expiring_link",
         ),
     ]

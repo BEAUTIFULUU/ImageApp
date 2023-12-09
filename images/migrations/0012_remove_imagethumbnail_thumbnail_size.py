@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0011_remove_tier_thumbnail_sizes_and_more'),
+        ("images", "0011_remove_tier_thumbnail_sizes_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='imagethumbnail',
-            name='thumbnail_size',
+            model_name="imagethumbnail",
+            name="thumbnail_size",
         ),
     ]

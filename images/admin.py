@@ -4,11 +4,10 @@ from .models import UserProfile, AccountTier
 
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'account_tier')
+    list_display = ("user", "account_tier")
     form = UserProfileAdminForm
 
 
 class TierAdmin(admin.ModelAdmin):
-
     admin.site.register(UserProfile, UserProfileAdmin)
     admin.site.register(AccountTier)

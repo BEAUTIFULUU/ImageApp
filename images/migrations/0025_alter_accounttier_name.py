@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0024_alter_accounttier_thumbnail_width'),
+        ("images", "0024_alter_accounttier_thumbnail_width"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='accounttier',
-            name='name',
+            model_name="accounttier",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
     ]
