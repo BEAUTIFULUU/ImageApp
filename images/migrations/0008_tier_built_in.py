@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0007_userprofile_custom_tier'),
+        ("images", "0007_userprofile_custom_tier"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tier',
-            name='built_in',
+            model_name="tier",
+            name="built_in",
             field=models.BooleanField(default=False),
         ),
     ]

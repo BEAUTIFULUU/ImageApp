@@ -5,15 +5,19 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0013_customtier_alter_userprofile_custom_tier_delete_tier'),
+        ("images", "0013_customtier_alter_userprofile_custom_tier_delete_tier"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='imagethumbnail',
-            name='custom_tier',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='images.customtier'),
+            model_name="imagethumbnail",
+            name="custom_tier",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="images.customtier",
+            ),
         ),
     ]

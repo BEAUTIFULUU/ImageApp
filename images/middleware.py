@@ -7,7 +7,7 @@ class LinkExpirationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        expires_str = request.GET.get('expires')
+        expires_str = request.GET.get("expires")
         if expires_str:
             expires = datetime.strptime(expires_str, "%H:%M:%S").time()
             current_time = datetime.now().time()

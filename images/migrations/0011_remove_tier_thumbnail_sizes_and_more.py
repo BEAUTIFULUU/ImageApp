@@ -4,19 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0010_alter_userprofile_account_tier'),
+        ("images", "0010_alter_userprofile_account_tier"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='tier',
-            name='thumbnail_sizes',
+            model_name="tier",
+            name="thumbnail_sizes",
         ),
         migrations.AddField(
-            model_name='imagethumbnail',
-            name='thumbnail_size',
+            model_name="imagethumbnail",
+            name="thumbnail_size",
             field=models.JSONField(blank=True, null=True),
         ),
     ]

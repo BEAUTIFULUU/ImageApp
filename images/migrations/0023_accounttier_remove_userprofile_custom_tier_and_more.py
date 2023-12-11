@@ -6,33 +6,62 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0022_alter_customtier_thumbnail_height'),
+        ("images", "0022_alter_customtier_thumbnail_height"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AccountTier',
+            name="AccountTier",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('original_image_link', models.BooleanField(default=True)),
-                ('expiring_link', models.BooleanField(default=False)),
-                ('thumbnail_height', models.IntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(5000)])),
-                ('thumbnail_width', models.IntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(5000)])),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("original_image_link", models.BooleanField(default=True)),
+                ("expiring_link", models.BooleanField(default=False)),
+                (
+                    "thumbnail_height",
+                    models.IntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(5000),
+                        ]
+                    ),
+                ),
+                (
+                    "thumbnail_width",
+                    models.IntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(5000),
+                        ]
+                    ),
+                ),
             ],
         ),
         migrations.RemoveField(
-            model_name='userprofile',
-            name='custom_tier',
+            model_name="userprofile",
+            name="custom_tier",
         ),
         migrations.DeleteModel(
-            name='CustomTier',
+            name="CustomTier",
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='account_tier',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='users', to='images.accounttier'),
+            model_name="userprofile",
+            name="account_tier",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="users",
+                to="images.accounttier",
+            ),
         ),
     ]

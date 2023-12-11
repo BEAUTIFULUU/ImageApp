@@ -5,28 +5,40 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0012_remove_imagethumbnail_thumbnail_size'),
+        ("images", "0012_remove_imagethumbnail_thumbnail_size"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CustomTier',
+            name="CustomTier",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('original_image_link', models.BooleanField(default=True)),
-                ('expiring_links', models.BooleanField(default=False)),
-                ('thumbnail_sizes', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("original_image_link", models.BooleanField(default=True)),
+                ("expiring_links", models.BooleanField(default=False)),
+                ("thumbnail_sizes", models.CharField(max_length=255)),
             ],
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='custom_tier',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='images.customtier'),
+            model_name="userprofile",
+            name="custom_tier",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="images.customtier",
+            ),
         ),
         migrations.DeleteModel(
-            name='Tier',
+            name="Tier",
         ),
     ]

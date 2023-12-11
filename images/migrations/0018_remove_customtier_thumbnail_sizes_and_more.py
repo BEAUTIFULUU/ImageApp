@@ -4,33 +4,32 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0017_remove_customtier_image_thumb_and_more'),
+        ("images", "0017_remove_customtier_image_thumb_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='customtier',
-            name='thumbnail_sizes',
+            model_name="customtier",
+            name="thumbnail_sizes",
         ),
         migrations.RemoveField(
-            model_name='imagethumbnail',
-            name='custom_tier',
+            model_name="imagethumbnail",
+            name="custom_tier",
         ),
         migrations.RemoveField(
-            model_name='imagethumbnail',
-            name='original_image_link',
+            model_name="imagethumbnail",
+            name="original_image_link",
         ),
         migrations.AddField(
-            model_name='customtier',
-            name='thumbnail_height',
+            model_name="customtier",
+            name="thumbnail_height",
             field=models.IntegerField(default=1),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='customtier',
-            name='thumbnail_width',
+            model_name="customtier",
+            name="thumbnail_width",
             field=models.IntegerField(default=1),
             preserve_default=False,
         ),

@@ -6,20 +6,33 @@ import images.services.cloud_services
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0026_alter_imagethumbnail_image_thumb_and_more'),
+        ("images", "0026_alter_imagethumbnail_image_thumb_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='imagethumbnail',
-            name='image_thumb',
-            field=models.ImageField(upload_to=images.services.cloud_services.thumbnail_upload_path, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['jpg', 'png'])]),
+            model_name="imagethumbnail",
+            name="image_thumb",
+            field=models.ImageField(
+                upload_to=images.services.cloud_services.thumbnail_upload_path,
+                validators=[
+                    django.core.validators.FileExtensionValidator(
+                        allowed_extensions=["jpg", "png"]
+                    )
+                ],
+            ),
         ),
         migrations.AlterField(
-            model_name='userimage',
-            name='image',
-            field=models.ImageField(upload_to=images.services.cloud_services.user_image_upload_path, validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['jpg', 'png'])]),
+            model_name="userimage",
+            name="image",
+            field=models.ImageField(
+                upload_to=images.services.cloud_services.user_image_upload_path,
+                validators=[
+                    django.core.validators.FileExtensionValidator(
+                        allowed_extensions=["jpg", "png"]
+                    )
+                ],
+            ),
         ),
     ]

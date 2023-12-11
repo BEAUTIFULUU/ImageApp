@@ -5,29 +5,33 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('images', '0016_customtier_image_thumb'),
+        ("images", "0016_customtier_image_thumb"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='customtier',
-            name='image_thumb',
+            model_name="customtier",
+            name="image_thumb",
         ),
         migrations.AddField(
-            model_name='imagethumbnail',
-            name='custom_tier',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='images.customtier'),
+            model_name="imagethumbnail",
+            name="custom_tier",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="images.customtier",
+            ),
         ),
         migrations.AddField(
-            model_name='imagethumbnail',
-            name='original_image_link',
+            model_name="imagethumbnail",
+            name="original_image_link",
             field=models.URLField(blank=True),
         ),
         migrations.AlterField(
-            model_name='customtier',
-            name='thumbnail_sizes',
+            model_name="customtier",
+            name="thumbnail_sizes",
             field=models.CharField(blank=True, max_length=255),
         ),
     ]

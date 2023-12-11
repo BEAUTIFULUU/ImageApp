@@ -10,7 +10,7 @@ from images.models import ImageThumbnail, UserImage
 def resize_image(height: int, width: int, image_id: int) -> None:
     user_image = UserImage.objects.get(pk=image_id)
     img = Image.open(user_image.image)
-    img.convert('RGB')
+    img.convert("RGB")
 
     new_height = height
     if width is not None:
@@ -20,11 +20,14 @@ def resize_image(height: int, width: int, image_id: int) -> None:
 
     resized_img = img.resize((new_height, new_width))
     output = BytesIO()
-    resized_img.save(output, format='JPEG')
+    resized_img.save(output, format="JPEG")
     output.seek(0)
 
     thumbnail = ImageThumbnail.objects.create(user_image=user_image)
     thumbnail.image_thumb.save(
-        f'thumbnail_{new_height}x{new_width}_{uuid.uuid4()}.jpg', File(ContentFile(output.read())), save=True)
+        f"thumbnail_{new_height}x{new_width}_{uuid.uuid4()}.jpg",
+        File(ContentFile(output.read())),
+        save=True,
+    )
 
     output.close()
